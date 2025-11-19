@@ -1,9 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
 import { ScoringService } from '../services/scoring.service';
+import { RiskAnalysisService } from '../services/risk-analysis.service';
+import { RecommendationService } from '../services/recommendation.service';
 
 const prisma = new PrismaClient();
 const scoringService = new ScoringService();
+const riskAnalysisService = new RiskAnalysisService();
+const recommendationService = new RecommendationService();
 
 export class AssessmentController {
   /**
@@ -168,6 +172,26 @@ export class AssessmentController {
               },
             },
           },
+          riskFlags: {
+            orderBy: [
+              { riskLevel: 'desc' },
+              { createdAt: 'asc' },
+            ],
+          },
+          recommendations: {
+            include: {
+              module: {
+                select: {
+                  name: true,
+                  category: true,
+                },
+              },
+            },
+            orderBy: [
+              { priority: 'asc' },
+              { createdAt: 'asc' },
+            ],
+          },
           _count: {
             select: {
               responses: true,
@@ -324,7 +348,13 @@ export class AssessmentController {
       // Trigger scoring engine
       await scoringService.scoreAssessment(id);
 
-      // Fetch updated assessment with scores
+      // Generate risk flags based on scores
+      await riskAnalysisService.generateRiskFlags(id);
+
+      // Generate recommendations based on scores
+      await recommendationService.generateRecommendations(id);
+
+      // Fetch updated assessment with scores, risks, and recommendations
       const scoredAssessment = await prisma.assessment.findUnique({
         where: { id },
         include: {
@@ -348,6 +378,26 @@ export class AssessmentController {
               },
             },
           },
+          riskFlags: {
+            orderBy: [
+              { riskLevel: 'desc' },
+              { createdAt: 'asc' },
+            ],
+          },
+          recommendations: {
+            include: {
+              module: {
+                select: {
+                  name: true,
+                  category: true,
+                },
+              },
+            },
+            orderBy: [
+              { priority: 'asc' },
+              { createdAt: 'asc' },
+            ],
+          },
           _count: {
             select: {
               responses: true,
@@ -357,7 +407,7 @@ export class AssessmentController {
       });
 
       res.status(200).json({
-        message: 'Assessment submitted and scored successfully',
+        message: 'Assessment submitted, scored, and analyzed successfully',
         data: scoredAssessment,
       });
     } catch (error) {

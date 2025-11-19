@@ -22,6 +22,54 @@ export interface ModuleScore {
   };
 }
 
+export enum RiskLevel {
+  LOW = 'LOW',
+  MEDIUM = 'MEDIUM',
+  HIGH = 'HIGH',
+  CRITICAL = 'CRITICAL',
+}
+
+export interface RiskFlag {
+  id: string;
+  assessmentId: string;
+  title: string;
+  description: string;
+  riskLevel: RiskLevel;
+  category: string;
+  impact: string;
+  mitigation: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export enum RecommendationPriority {
+  IMMEDIATE = 'IMMEDIATE',
+  SHORT_TERM = 'SHORT_TERM',
+  MEDIUM_TERM = 'MEDIUM_TERM',
+  LONG_TERM = 'LONG_TERM',
+}
+
+export interface Recommendation {
+  id: string;
+  assessmentId: string;
+  moduleId: string;
+  title: string;
+  description: string;
+  priority: RecommendationPriority;
+  estimatedCost: string | null;
+  estimatedTimeframe: string | null;
+  expectedImpact: string;
+  valuationImpact: string | null;
+  implementationSteps: string[] | null;
+  resources: Array<{ title: string; url?: string; description: string }> | null;
+  createdAt: string;
+  updatedAt: string;
+  module?: {
+    name: string;
+    category: string;
+  };
+}
+
 export interface Assessment {
   id: string;
   userId: string;
@@ -44,6 +92,8 @@ export interface Assessment {
   };
   responses?: Response[];
   moduleScores?: ModuleScore[];
+  riskFlags?: RiskFlag[];
+  recommendations?: Recommendation[];
   _count?: {
     responses: number;
   };
@@ -140,4 +190,44 @@ export const getAssessmentStatusColor = (status: AssessmentStatus): string => {
     [AssessmentStatus.COMPLETED]: 'bg-green-100 text-green-800',
   };
   return colors[status];
+};
+
+export const getRiskLevelLabel = (level: RiskLevel): string => {
+  const labels: Record<RiskLevel, string> = {
+    [RiskLevel.LOW]: 'Low Risk',
+    [RiskLevel.MEDIUM]: 'Medium Risk',
+    [RiskLevel.HIGH]: 'High Risk',
+    [RiskLevel.CRITICAL]: 'Critical Risk',
+  };
+  return labels[level];
+};
+
+export const getRiskLevelColor = (level: RiskLevel): string => {
+  const colors: Record<RiskLevel, string> = {
+    [RiskLevel.LOW]: 'bg-blue-100 text-blue-800 border-blue-200',
+    [RiskLevel.MEDIUM]: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    [RiskLevel.HIGH]: 'bg-orange-100 text-orange-800 border-orange-200',
+    [RiskLevel.CRITICAL]: 'bg-red-100 text-red-800 border-red-200',
+  };
+  return colors[level];
+};
+
+export const getRecommendationPriorityLabel = (priority: RecommendationPriority): string => {
+  const labels: Record<RecommendationPriority, string> = {
+    [RecommendationPriority.IMMEDIATE]: 'Immediate (0-30 days)',
+    [RecommendationPriority.SHORT_TERM]: 'Short Term (30-90 days)',
+    [RecommendationPriority.MEDIUM_TERM]: 'Medium Term (90-180 days)',
+    [RecommendationPriority.LONG_TERM]: 'Long Term (180+ days)',
+  };
+  return labels[priority];
+};
+
+export const getRecommendationPriorityColor = (priority: RecommendationPriority): string => {
+  const colors: Record<RecommendationPriority, string> = {
+    [RecommendationPriority.IMMEDIATE]: 'bg-red-100 text-red-800 border-red-200',
+    [RecommendationPriority.SHORT_TERM]: 'bg-orange-100 text-orange-800 border-orange-200',
+    [RecommendationPriority.MEDIUM_TERM]: 'bg-yellow-100 text-yellow-800 border-yellow-200',
+    [RecommendationPriority.LONG_TERM]: 'bg-blue-100 text-blue-800 border-blue-200',
+  };
+  return colors[priority];
 };
