@@ -22,6 +22,7 @@ export default function AssessmentResultsPage() {
 
   const [assessment, setAssessment] = useState<Assessment | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [activeTab, setActiveTab] = useState<'overview' | 'risks' | 'recommendations'>('overview');
 
   useEffect(() => {
@@ -46,6 +47,46 @@ export default function AssessmentResultsPage() {
       router.push('/dashboard');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const downloadPDF = async () => {
+    try {
+      setIsDownloading(true);
+      const token = localStorage.getItem('accessToken');
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/reports/assessment/${assessmentId}/pdf`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to generate PDF');
+      }
+
+      // Create blob from response
+      const blob = await response.blob();
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Digital-Readiness-Assessment-${assessmentId}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success('PDF report downloaded successfully!');
+    } catch (error: any) {
+      console.error('PDF download error:', error);
+      toast.error('Failed to download PDF report');
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -442,10 +483,37 @@ export default function AssessmentResultsPage() {
             View All Assessments
           </button>
           <button
-            className="rounded-md bg-primary-600 px-6 py-3 text-sm font-medium text-white hover:bg-primary-700"
-            onClick={() => toast.info('PDF generation coming soon!')}
+            className="rounded-md bg-primary-600 px-6 py-3 text-sm font-medium text-white hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            onClick={downloadPDF}
+            disabled={isDownloading}
           >
-            Download PDF Report
+            {isDownloading ? (
+              <span className="flex items-center">
+                <svg
+                  className="mr-2 h-4 w-4 animate-spin"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
+                </svg>
+                Generating PDF...
+              </span>
+            ) : (
+              'Download PDF Report'
+            )}
           </button>
         </div>
       </div>

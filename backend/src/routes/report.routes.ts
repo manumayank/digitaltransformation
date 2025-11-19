@@ -1,15 +1,20 @@
 import { Router } from 'express';
-import { authenticate } from '../middleware/auth';
+import { ReportController } from '../controllers/report.controller';
+import { authMiddleware } from '../middleware/auth.middleware';
 
 const router = Router();
+const reportController = new ReportController();
 
-router.use(authenticate);
+// All report routes require authentication
+router.use(authMiddleware);
 
-// GET /api/v1/reports/:assessmentId - Get report for assessment
-// GET /api/v1/reports/:assessmentId/download - Download PDF report
-
-router.get('/', (req, res) => {
-  res.json({ message: 'Report routes - Coming soon' });
-});
+/**
+ * @route   GET /api/v1/reports/assessment/:id/pdf
+ * @desc    Generate and download PDF report for an assessment
+ * @access  Private
+ */
+router.get('/assessment/:id/pdf', (req, res, next) =>
+  reportController.generatePDF(req, res, next)
+);
 
 export default router;
