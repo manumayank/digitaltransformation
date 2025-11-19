@@ -1,0 +1,420 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// USER MANAGEMENT
+// ============================================
+
+enum UserRole {
+  USER
+  CONSULTANT
+  ADMIN
+  SUPER_ADMIN
+}
+
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  passwordHash  String
+  firstName     String?
+  lastName      String?
+  phone         String?
+  role          UserRole @default(USER)
+  isActive      Boolean  @default(true)
+  emailVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  // Relations
+  businessProfiles BusinessProfile[]
+  assessments      Assessment[]
+  auditLogs        AuditLog[]
+  refreshTokens    RefreshToken[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("refresh_tokens")
+}
+
+// ============================================
+// BUSINESS PROFILE
+// ============================================
+
+enum Industry {
+  TECHNOLOGY
+  RETAIL
+  MANUFACTURING
+  HEALTHCARE
+  FINANCE
+  REAL_ESTATE
+  HOSPITALITY
+  EDUCATION
+  CONSTRUCTION
+  PROFESSIONAL_SERVICES
+  FOOD_AND_BEVERAGE
+  TRANSPORTATION
+  AGRICULTURE
+  ENTERTAINMENT
+  OTHER
+}
+
+enum BusinessSize {
+  MICRO           // 1-10 employees
+  SMALL           // 11-50 employees
+  MEDIUM          // 51-250 employees
+  LARGE           // 251+ employees
+}
+
+enum GrowthStage {
+  STARTUP
+  EARLY_GROWTH
+  ESTABLISHED
+  MATURE
+  EXIT_READY
+}
+
+model BusinessProfile {
+  id                String       @id @default(uuid())
+  userId            String
+  businessName      String
+  industry          Industry
+  businessSize      BusinessSize
+  growthStage       GrowthStage
+  annualRevenue     Float?
+  numberOfEmployees Int?
+  numberOfLocations Int?
+  yearEstablished   Int?
+  exitTimeline      String?      // e.g., "1-2 years", "3-5 years"
+  description       String?      @db.Text
+  website           String?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  assessments Assessment[]
+
+  @@index([userId])
+  @@map("business_profiles")
+}
+
+// ============================================
+// ASSESSMENT MODULES
+// ============================================
+
+enum ModuleCategory {
+  DIGITAL_PRESENCE
+  PROCESS_ORGANIZATION
+  CRM_ERP_SYSTEMS
+  FINANCIAL_SYSTEMS
+  TECH_INFRASTRUCTURE
+  DATA_SECURITY
+  PEOPLE_TRAINING
+  CUSTOMER_EXPERIENCE
+  SCALABILITY
+  SUCCESSION_READINESS
+}
+
+model Module {
+  id          String         @id @default(uuid())
+  name        String
+  category    ModuleCategory @unique
+  description String         @db.Text
+  weight      Float          @default(10.0) // Percentage weight for scoring
+  orderIndex  Int
+  isActive    Boolean        @default(true)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  questions       Question[]
+  moduleScores    ModuleScore[]
+  recommendations Recommendation[]
+
+  @@index([category])
+  @@map("modules")
+}
+
+// ============================================
+// QUESTIONS & ADAPTIVE LOGIC
+// ============================================
+
+enum QuestionType {
+  YES_NO
+  MULTIPLE_CHOICE
+  SCALE
+  TEXT
+  FILE_UPLOAD
+}
+
+model Question {
+  id                 String       @id @default(uuid())
+  moduleId           String
+  questionText       String       @db.Text
+  questionType       QuestionType
+  options            Json? // Array of options for MULTIPLE_CHOICE
+  scaleMin           Int?
+  scaleMax           Int?
+  weight             Float        @default(1.0)
+  orderIndex         Int
+  isRequired         Boolean      @default(true)
+  isActive           Boolean      @default(true)
+  // Adaptive logic
+  conditionalLogic   Json? // Rules for when to show this question
+  applicableIndustry String[] // Empty array means applicable to all
+  applicableSize     String[] // Empty array means applicable to all
+  helpText           String?      @db.Text
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  module    Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  responses Response[]
+
+  @@index([moduleId])
+  @@index([orderIndex])
+  @@map("questions")
+}
+
+// ============================================
+// ASSESSMENT & RESPONSES
+// ============================================
+
+enum AssessmentStatus {
+  DRAFT
+  IN_PROGRESS
+  SUBMITTED
+  COMPLETED
+}
+
+model Assessment {
+  id                String           @id @default(uuid())
+  userId            String
+  businessProfileId String
+  status            AssessmentStatus @default(DRAFT)
+  startedAt         DateTime         @default(now())
+  submittedAt       DateTime?
+  completedAt       DateTime?
+  // Overall scores
+  digitalScore      Float?
+  legacyScore       Float?
+  overallScore      Float?
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessProfile BusinessProfile   @relation(fields: [businessProfileId], references: [id], onDelete: Cascade)
+  responses       Response[]
+  moduleScores    ModuleScore[]
+  recommendations Recommendation[]
+  reports         Report[]
+  riskFlags       RiskFlag[]
+
+  @@index([userId])
+  @@index([businessProfileId])
+  @@index([status])
+  @@map("assessments")
+}
+
+model Response {
+  id           String   @id @default(uuid())
+  assessmentId String
+  questionId   String
+  answer       Json // Flexible storage for different answer types
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  question   Question   @relation(fields: [questionId], references: [id], onDelete: Cascade)
+
+  @@unique([assessmentId, questionId])
+  @@index([assessmentId])
+  @@map("responses")
+}
+
+// ============================================
+// SCORING
+// ============================================
+
+model ModuleScore {
+  id           String   @id @default(uuid())
+  assessmentId String
+  moduleId     String
+  score        Float // 0-100
+  maxScore     Float    @default(100)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  module     Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([assessmentId, moduleId])
+  @@index([assessmentId])
+  @@map("module_scores")
+}
+
+// ============================================
+// RISK FLAGS
+// ============================================
+
+enum RiskLevel {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model RiskFlag {
+  id           String    @id @default(uuid())
+  assessmentId String
+  title        String
+  description  String    @db.Text
+  riskLevel    RiskLevel
+  category     String
+  impact       String    @db.Text
+  mitigation   String?   @db.Text
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([assessmentId])
+  @@index([riskLevel])
+  @@map("risk_flags")
+}
+
+// ============================================
+// RECOMMENDATIONS
+// ============================================
+
+enum RecommendationPriority {
+  IMMEDIATE      // 0-30 days
+  SHORT_TERM     // 30-90 days
+  MEDIUM_TERM    // 90-180 days
+  LONG_TERM      // 180+ days
+}
+
+model Recommendation {
+  id                 String                   @id @default(uuid())
+  assessmentId       String
+  moduleId           String
+  title              String
+  description        String                   @db.Text
+  priority           RecommendationPriority
+  estimatedCost      String? // e.g., "Low ($0-5K)", "Medium ($5K-20K)"
+  estimatedTimeframe String? // e.g., "2-4 weeks"
+  expectedImpact     String                   @db.Text
+  valuationImpact    String? // How this affects business valuation
+  implementationSteps Json? // Array of steps
+  resources          Json? // Links, tools, templates
+  createdAt          DateTime                 @default(now())
+  updatedAt          DateTime                 @updatedAt
+
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+  module     Module     @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@index([assessmentId])
+  @@index([priority])
+  @@map("recommendations")
+}
+
+// ============================================
+// REPORTS
+// ============================================
+
+enum ReportStatus {
+  GENERATING
+  COMPLETED
+  FAILED
+}
+
+model Report {
+  id            String       @id @default(uuid())
+  assessmentId  String
+  reportData    Json // Complete report structure
+  pdfUrl        String? // S3/Cloud storage URL
+  reportStatus  ReportStatus @default(GENERATING)
+  generatedAt   DateTime     @default(now())
+  downloadCount Int          @default(0)
+  lastDownloadAt DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  assessment Assessment @relation(fields: [assessmentId], references: [id], onDelete: Cascade)
+
+  @@index([assessmentId])
+  @@map("reports")
+}
+
+// ============================================
+// INDUSTRY TEMPLATES (Admin managed)
+// ============================================
+
+model IndustryTemplate {
+  id                 String   @id @default(uuid())
+  industry           Industry
+  templateName       String
+  questionSetConfig  Json // Configuration for which questions to include
+  scoringWeights     Json // Custom weights for this industry
+  benchmarkData      Json? // Industry benchmark scores
+  customRecommendations Json? // Industry-specific recommendations
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([industry, templateName])
+  @@map("industry_templates")
+}
+
+// ============================================
+// AUDIT LOGS
+// ============================================
+
+enum AuditAction {
+  CREATE
+  READ
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  EXPORT
+  SUBMIT
+}
+
+model AuditLog {
+  id         String      @id @default(uuid())
+  userId     String?
+  action     AuditAction
+  entityType String // e.g., "Assessment", "User", "Report"
+  entityId   String?
+  changes    Json? // Before/after data for updates
+  ipAddress  String?
+  userAgent  String?
+  createdAt  DateTime    @default(now())
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
