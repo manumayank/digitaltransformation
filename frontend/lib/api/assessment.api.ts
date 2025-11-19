@@ -8,6 +8,20 @@ export enum AssessmentStatus {
   COMPLETED = 'COMPLETED',
 }
 
+export interface ModuleScore {
+  id: string;
+  assessmentId: string;
+  moduleId: string;
+  score: number;
+  maxScore: number;
+  createdAt: string;
+  updatedAt: string;
+  module?: {
+    name: string;
+    category: string;
+  };
+}
+
 export interface Assessment {
   id: string;
   userId: string;
@@ -29,6 +43,7 @@ export interface Assessment {
     growthStage?: string;
   };
   responses?: Response[];
+  moduleScores?: ModuleScore[];
   _count?: {
     responses: number;
   };

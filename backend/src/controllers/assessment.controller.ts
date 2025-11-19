@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { PrismaClient } from '@prisma/client';
+import { ScoringService } from '../services/scoring.service';
 
 const prisma = new PrismaClient();
+const scoringService = new ScoringService();
 
 export class AssessmentController {
   /**
@@ -149,6 +151,21 @@ export class AssessmentController {
               answer: true,
               createdAt: true,
               updatedAt: true,
+            },
+          },
+          moduleScores: {
+            include: {
+              module: {
+                select: {
+                  name: true,
+                  category: true,
+                },
+              },
+            },
+            orderBy: {
+              module: {
+                orderIndex: 'asc',
+              },
             },
           },
           _count: {
@@ -304,12 +321,44 @@ export class AssessmentController {
         },
       });
 
-      // TODO: Trigger scoring engine here (P2 feature)
-      // await scoringService.calculateScores(id);
+      // Trigger scoring engine
+      await scoringService.scoreAssessment(id);
+
+      // Fetch updated assessment with scores
+      const scoredAssessment = await prisma.assessment.findUnique({
+        where: { id },
+        include: {
+          businessProfile: {
+            select: {
+              businessName: true,
+            },
+          },
+          moduleScores: {
+            include: {
+              module: {
+                select: {
+                  name: true,
+                  category: true,
+                },
+              },
+            },
+            orderBy: {
+              module: {
+                orderIndex: 'asc',
+              },
+            },
+          },
+          _count: {
+            select: {
+              responses: true,
+            },
+          },
+        },
+      });
 
       res.status(200).json({
-        message: 'Assessment submitted successfully',
-        data: updatedAssessment,
+        message: 'Assessment submitted and scored successfully',
+        data: scoredAssessment,
       });
     } catch (error) {
       next(error);

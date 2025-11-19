@@ -174,8 +174,8 @@ export default function AssessmentPage() {
       // Then submit the assessment
       await assessmentAPI.submit(assessmentId);
 
-      toast.success('Assessment submitted successfully!');
-      router.push('/dashboard');
+      toast.success('Assessment submitted and scored successfully!');
+      router.push(`/assessment/${assessmentId}/results`);
     } catch (error: any) {
       toast.error('Failed to submit assessment');
     } finally {
