@@ -1,0 +1,84 @@
+# User Profile API Tests
+# Use with REST Client extension in VSCode
+
+@baseUrl = http://localhost:3001/api/v1
+@token = your_access_token_here
+
+### 1. Get User Profile
+GET {{baseUrl}}/users/profile
+Authorization: Bearer {{token}}
+
+### 2. Update User Profile
+PUT {{baseUrl}}/users/profile
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "phone": "+1234567890"
+}
+
+### 3. Update Profile - Partial Update (First Name Only)
+PUT {{baseUrl}}/users/profile
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "firstName": "Jane"
+}
+
+### 4. Update Profile - Invalid Phone (Should Fail)
+PUT {{baseUrl}}/users/profile
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "phone": "invalid-phone"
+}
+
+### 5. Change Password
+PUT {{baseUrl}}/users/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "currentPassword": "OldPassword123!",
+  "newPassword": "NewPassword123!"
+}
+
+### 6. Change Password - Wrong Current Password (Should Fail)
+PUT {{baseUrl}}/users/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "currentPassword": "WrongPassword",
+  "newPassword": "NewPassword123!"
+}
+
+### 7. Change Password - Weak New Password (Should Fail)
+PUT {{baseUrl}}/users/password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "currentPassword": "OldPassword123!",
+  "newPassword": "weak"
+}
+
+### 8. Get User Statistics
+GET {{baseUrl}}/users/stats
+Authorization: Bearer {{token}}
+
+### 9. Delete Account (Deactivate)
+DELETE {{baseUrl}}/users/account
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "password": "YourPassword123!"
+}
+
+### 10. Get Profile Without Token (Should Fail)
+GET {{baseUrl}}/users/profile

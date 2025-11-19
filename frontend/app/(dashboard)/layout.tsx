@@ -62,9 +62,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-700">
+              <Link
+                href="/profile"
+                className="text-sm text-gray-700 hover:text-gray-900"
+              >
                 {user.firstName || user.email}
-              </span>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="rounded-md bg-gray-100 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200"
