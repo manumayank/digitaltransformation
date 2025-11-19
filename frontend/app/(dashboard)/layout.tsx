@@ -54,6 +54,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   Dashboard
                 </Link>
                 <Link
+                  href="/business-profile"
+                  className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                >
+                  Business Profiles
+                </Link>
+                <Link
                   href="/assessment"
                   className="inline-flex items-center border-b-2 border-transparent px-1 pt-1 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
                 >

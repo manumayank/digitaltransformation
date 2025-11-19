@@ -1,0 +1,207 @@
+### Business Profile API Tests
+@baseUrl = http://localhost:3001/api/v1
+@token = YOUR_AUTH_TOKEN_HERE
+
+### 1. Create Business Profile - Success
+POST {{baseUrl}}/business-profiles
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "businessName": "Tech Innovators Inc.",
+  "industry": "TECHNOLOGY",
+  "businessSize": "SMALL",
+  "growthStage": "EARLY_GROWTH",
+  "annualRevenue": 1500000,
+  "numberOfEmployees": 25,
+  "numberOfLocations": 2,
+  "yearEstablished": 2018,
+  "exitTimeline": "3-5 years",
+  "description": "A cutting-edge software development company specializing in AI and machine learning solutions.",
+  "website": "https://techinnovators.example.com"
+}
+
+### 2. Create Business Profile - Minimal Required Fields
+POST {{baseUrl}}/business-profiles
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "businessName": "Quick Start LLC",
+  "industry": "RETAIL",
+  "businessSize": "MICRO",
+  "growthStage": "STARTUP"
+}
+
+### 3. Create Business Profile - Invalid Industry (Should Fail)
+POST {{baseUrl}}/business-profiles
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "businessName": "Test Company",
+  "industry": "INVALID_INDUSTRY",
+  "businessSize": "SMALL",
+  "growthStage": "STARTUP"
+}
+
+### 4. Create Business Profile - Missing Required Fields (Should Fail)
+POST {{baseUrl}}/business-profiles
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "businessName": "Test Company"
+}
+
+### 5. Create Business Profile - Invalid Website URL (Should Fail)
+POST {{baseUrl}}/business-profiles
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "businessName": "Test Company",
+  "industry": "TECHNOLOGY",
+  "businessSize": "SMALL",
+  "growthStage": "STARTUP",
+  "website": "not-a-valid-url"
+}
+
+### 6. Get All Business Profiles
+GET {{baseUrl}}/business-profiles
+Authorization: Bearer {{token}}
+
+### 7. Get Business Profile by ID
+# Replace {profileId} with actual ID from create response
+GET {{baseUrl}}/business-profiles/{profileId}
+Authorization: Bearer {{token}}
+
+### 8. Get Business Profile by ID - Not Found (Should Fail)
+GET {{baseUrl}}/business-profiles/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+
+### 9. Get Business Profile by ID - Invalid UUID (Should Fail)
+GET {{baseUrl}}/business-profiles/invalid-uuid
+Authorization: Bearer {{token}}
+
+### 10. Update Business Profile - Full Update
+# Replace {profileId} with actual ID
+PUT {{baseUrl}}/business-profiles/{profileId}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "businessName": "Tech Innovators Inc. (Updated)",
+  "industry": "TECHNOLOGY",
+  "businessSize": "MEDIUM",
+  "growthStage": "ESTABLISHED",
+  "annualRevenue": 3500000,
+  "numberOfEmployees": 75,
+  "numberOfLocations": 3,
+  "yearEstablished": 2018,
+  "exitTimeline": "5-10 years",
+  "description": "Updated description with new achievements and milestones.",
+  "website": "https://techinnovators-updated.example.com"
+}
+
+### 11. Update Business Profile - Partial Update
+# Replace {profileId} with actual ID
+PUT {{baseUrl}}/business-profiles/{profileId}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "businessName": "Tech Innovators Group",
+  "numberOfEmployees": 100
+}
+
+### 12. Update Business Profile - Clear Optional Fields
+# Replace {profileId} with actual ID
+PUT {{baseUrl}}/business-profiles/{profileId}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "annualRevenue": null,
+  "exitTimeline": null,
+  "website": null
+}
+
+### 13. Update Business Profile - Invalid Year (Should Fail)
+# Replace {profileId} with actual ID
+PUT {{baseUrl}}/business-profiles/{profileId}
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "yearEstablished": 2050
+}
+
+### 14. Get Business Profile Statistics
+# Replace {profileId} with actual ID
+GET {{baseUrl}}/business-profiles/{profileId}/stats
+Authorization: Bearer {{token}}
+
+### 15. Delete Business Profile
+# Replace {profileId} with actual ID
+DELETE {{baseUrl}}/business-profiles/{profileId}
+Authorization: Bearer {{token}}
+
+### 16. Delete Business Profile - Not Found (Should Fail)
+DELETE {{baseUrl}}/business-profiles/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+
+### 17. Delete Business Profile - With Assessments (Should Fail)
+# This should fail if the profile has associated assessments
+# Replace {profileId} with ID of a profile that has assessments
+DELETE {{baseUrl}}/business-profiles/{profileId}
+Authorization: Bearer {{token}}
+
+### 18. Create Business Profile - Without Auth Token (Should Fail)
+POST {{baseUrl}}/business-profiles
+Content-Type: application/json
+
+{
+  "businessName": "Unauthorized Test",
+  "industry": "TECHNOLOGY",
+  "businessSize": "SMALL",
+  "growthStage": "STARTUP"
+}
+
+### 19. Create Healthcare Business Profile
+POST {{baseUrl}}/business-profiles
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "businessName": "HealthCare Solutions Ltd.",
+  "industry": "HEALTHCARE",
+  "businessSize": "LARGE",
+  "growthStage": "MATURE",
+  "annualRevenue": 12000000,
+  "numberOfEmployees": 350,
+  "numberOfLocations": 8,
+  "yearEstablished": 2005,
+  "exitTimeline": "10+ years",
+  "description": "Comprehensive healthcare services provider with multiple specialties.",
+  "website": "https://healthcaresolutions.example.com"
+}
+
+### 20. Create Manufacturing Business Profile
+POST {{baseUrl}}/business-profiles
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "businessName": "Precision Manufacturing Co.",
+  "industry": "MANUFACTURING",
+  "businessSize": "MEDIUM",
+  "growthStage": "ESTABLISHED",
+  "annualRevenue": 8500000,
+  "numberOfEmployees": 120,
+  "numberOfLocations": 2,
+  "yearEstablished": 2010,
+  "exitTimeline": "3-5 years",
+  "description": "Precision components manufacturing for automotive and aerospace industries.",
+  "website": "https://precisionmfg.example.com"
+}
