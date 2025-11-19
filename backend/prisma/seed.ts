@@ -1,5 +1,6 @@
-import { PrismaClient, ModuleCategory, QuestionType, Industry } from '@prisma/client';
+import { PrismaClient, ModuleCategory, Industry } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import { seedQuestions } from './seeds/questions-seed';
 
 const prisma = new PrismaClient();
 
@@ -106,74 +107,8 @@ async function main() {
   }
   console.log('✓ Modules created');
 
-  // Create sample questions for Digital Presence module
-  const digitalPresenceModule = await prisma.module.findUnique({
-    where: { category: ModuleCategory.DIGITAL_PRESENCE },
-  });
-
-  if (digitalPresenceModule) {
-    const sampleQuestions = [
-      {
-        moduleId: digitalPresenceModule.id,
-        questionText: 'Does your business have a professional website?',
-        questionType: QuestionType.YES_NO,
-        weight: 1.0,
-        orderIndex: 1,
-        helpText: 'A professional website is essential for digital presence and credibility',
-      },
-      {
-        moduleId: digitalPresenceModule.id,
-        questionText: 'How would you rate your website\'s mobile responsiveness?',
-        questionType: QuestionType.SCALE,
-        scaleMin: 1,
-        scaleMax: 5,
-        weight: 1.0,
-        orderIndex: 2,
-        helpText: 'Mobile responsiveness is critical as most users browse on mobile devices',
-        conditionalLogic: {
-          showIf: {
-            questionId: 'previous', // Reference to previous question
-            answer: true,
-          },
-        },
-      },
-      {
-        moduleId: digitalPresenceModule.id,
-        questionText: 'Which digital marketing channels does your business actively use?',
-        questionType: QuestionType.MULTIPLE_CHOICE,
-        options: [
-          { id: 'social_media', label: 'Social Media (Facebook, Instagram, LinkedIn)' },
-          { id: 'email', label: 'Email Marketing' },
-          { id: 'seo', label: 'Search Engine Optimization (SEO)' },
-          { id: 'paid_ads', label: 'Paid Advertising (Google Ads, Facebook Ads)' },
-          { id: 'content', label: 'Content Marketing (Blog, Videos)' },
-          { id: 'none', label: 'None of the above' },
-        ],
-        weight: 1.5,
-        orderIndex: 3,
-      },
-      {
-        moduleId: digitalPresenceModule.id,
-        questionText: 'Do you actively monitor and respond to online reviews?',
-        questionType: QuestionType.MULTIPLE_CHOICE,
-        options: [
-          { id: 'yes_system', label: 'Yes, we have a system in place' },
-          { id: 'yes_adhoc', label: 'Yes, but only occasionally' },
-          { id: 'no', label: 'No, we don\'t monitor reviews' },
-          { id: 'no_reviews', label: 'We don\'t have any reviews' },
-        ],
-        weight: 1.0,
-        orderIndex: 4,
-      },
-    ];
-
-    for (const question of sampleQuestions) {
-      await prisma.question.create({
-        data: question,
-      });
-    }
-    console.log('✓ Sample questions created for Digital Presence module');
-  }
+  // Seed comprehensive questions for all modules
+  await seedQuestions();
 
   // Create industry templates
   const industries = Object.values(Industry);

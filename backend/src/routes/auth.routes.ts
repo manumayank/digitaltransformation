@@ -1,24 +1,47 @@
 import { Router } from 'express';
-// Import controllers when created
-// import { register, login, refreshToken, logout } from '../controllers/auth.controller';
+import { authController } from '../controllers/auth.controller';
+import { authenticate } from '../middleware/auth';
+import { validate } from '../middleware/validate';
+import { registerSchema, loginSchema, refreshTokenSchema } from '../validators/auth.validator';
 
 const router = Router();
 
-// POST /api/v1/auth/register
-// router.post('/register', register);
+// Public routes
+router.post(
+  '/register',
+  validate(registerSchema),
+  authController.register.bind(authController)
+);
 
-// POST /api/v1/auth/login
-// router.post('/login', login);
+router.post(
+  '/login',
+  validate(loginSchema),
+  authController.login.bind(authController)
+);
 
-// POST /api/v1/auth/refresh
-// router.post('/refresh', refreshToken);
+router.post(
+  '/refresh',
+  validate(refreshTokenSchema),
+  authController.refreshToken.bind(authController)
+);
 
-// POST /api/v1/auth/logout
-// router.post('/logout', logout);
+// Protected routes
+router.get(
+  '/me',
+  authenticate,
+  authController.getCurrentUser.bind(authController)
+);
 
-// Placeholder
-router.get('/', (req, res) => {
-  res.json({ message: 'Auth routes - Coming soon' });
-});
+router.post(
+  '/logout',
+  authenticate,
+  authController.logout.bind(authController)
+);
+
+router.post(
+  '/change-password',
+  authenticate,
+  authController.changePassword.bind(authController)
+);
 
 export default router;

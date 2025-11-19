@@ -1,0 +1,98 @@
+# Authentication API Tests
+# Use with REST Client extension in VSCode or similar tools
+
+@baseUrl = http://localhost:3001/api/v1
+@token = your_access_token_here
+@refreshToken = your_refresh_token_here
+
+### Health Check
+GET http://localhost:3001/health
+
+### 1. Register New User
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Test@1234",
+  "firstName": "John",
+  "lastName": "Doe"
+}
+
+### 2. Register User (Missing Password - Should Fail)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "test2@example.com"
+}
+
+### 3. Register User (Weak Password - Should Fail)
+POST {{baseUrl}}/auth/register
+Content-Type: application/json
+
+{
+  "email": "test3@example.com",
+  "password": "weak"
+}
+
+### 4. Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Test@1234"
+}
+
+### 5. Login (Wrong Password - Should Fail)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "WrongPassword123"
+}
+
+### 6. Get Current User (Protected - Use token from login)
+GET {{baseUrl}}/auth/me
+Authorization: Bearer {{token}}
+
+### 7. Get Current User (No Token - Should Fail)
+GET {{baseUrl}}/auth/me
+
+### 8. Refresh Token
+POST {{baseUrl}}/auth/refresh
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 9. Change Password (Protected)
+POST {{baseUrl}}/auth/change-password
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "currentPassword": "Test@1234",
+  "newPassword": "NewTest@1234"
+}
+
+### 10. Logout (Protected)
+POST {{baseUrl}}/auth/logout
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "refreshToken": "{{refreshToken}}"
+}
+
+### 11. Login with Admin (Created during seed)
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@drltas.com",
+  "password": "Admin@123"
+}
