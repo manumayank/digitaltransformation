@@ -1,0 +1,239 @@
+### Assessment API Tests
+@baseUrl = http://localhost:3001/api/v1
+@token = YOUR_AUTH_TOKEN_HERE
+
+### 1. Create Assessment - Success
+POST {{baseUrl}}/assessments
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "businessProfileId": "REPLACE_WITH_BUSINESS_PROFILE_ID"
+}
+
+### 2. Create Assessment - Invalid Business Profile ID (Should Fail)
+POST {{baseUrl}}/assessments
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "businessProfileId": "invalid-uuid"
+}
+
+### 3. Create Assessment - Non-existent Business Profile (Should Fail)
+POST {{baseUrl}}/assessments
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "businessProfileId": "00000000-0000-0000-0000-000000000000"
+}
+
+### 4. Create Assessment - Without Auth (Should Fail)
+POST {{baseUrl}}/assessments
+Content-Type: application/json
+
+{
+  "businessProfileId": "REPLACE_WITH_BUSINESS_PROFILE_ID"
+}
+
+### 5. Get All Assessments - Success
+GET {{baseUrl}}/assessments
+Authorization: Bearer {{token}}
+
+### 6. Get All Assessments - Without Auth (Should Fail)
+GET {{baseUrl}}/assessments
+
+### 7. Get Assessment by ID - Success
+# Replace {assessmentId} with actual ID from create response
+GET {{baseUrl}}/assessments/{assessmentId}
+Authorization: Bearer {{token}}
+
+### 8. Get Assessment by ID - Not Found (Should Fail)
+GET {{baseUrl}}/assessments/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+
+### 9. Get Assessment by ID - Invalid UUID (Should Fail)
+GET {{baseUrl}}/assessments/invalid-uuid
+Authorization: Bearer {{token}}
+
+### 10. Save Responses - Success (Single Response)
+# Replace {assessmentId} and {questionId} with actual IDs
+PUT {{baseUrl}}/assessments/{assessmentId}/responses
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "responses": [
+    {
+      "questionId": "REPLACE_WITH_QUESTION_ID",
+      "answer": true
+    }
+  ]
+}
+
+### 11. Save Responses - Success (Multiple Responses)
+# Replace {assessmentId} and question IDs with actual IDs
+PUT {{baseUrl}}/assessments/{assessmentId}/responses
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "responses": [
+    {
+      "questionId": "REPLACE_WITH_QUESTION_ID_1",
+      "answer": true
+    },
+    {
+      "questionId": "REPLACE_WITH_QUESTION_ID_2",
+      "answer": "Option A"
+    },
+    {
+      "questionId": "REPLACE_WITH_QUESTION_ID_3",
+      "answer": 8
+    },
+    {
+      "questionId": "REPLACE_WITH_QUESTION_ID_4",
+      "answer": "This is a text response"
+    }
+  ]
+}
+
+### 12. Save Responses - Update Existing Response
+# This should update an existing response
+PUT {{baseUrl}}/assessments/{assessmentId}/responses
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "responses": [
+    {
+      "questionId": "REPLACE_WITH_EXISTING_QUESTION_ID",
+      "answer": false
+    }
+  ]
+}
+
+### 13. Save Responses - Invalid Assessment ID (Should Fail)
+PUT {{baseUrl}}/assessments/00000000-0000-0000-0000-000000000000/responses
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "responses": [
+    {
+      "questionId": "REPLACE_WITH_QUESTION_ID",
+      "answer": true
+    }
+  ]
+}
+
+### 14. Save Responses - Invalid Question ID Format (Should Fail)
+PUT {{baseUrl}}/assessments/{assessmentId}/responses
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "responses": [
+    {
+      "questionId": "invalid-uuid",
+      "answer": true
+    }
+  ]
+}
+
+### 15. Submit Assessment - Success
+# Replace {assessmentId} with actual ID
+POST {{baseUrl}}/assessments/{assessmentId}/submit
+Authorization: Bearer {{token}}
+
+### 16. Submit Assessment - Already Submitted (Should Fail)
+# Run after test 15 to verify it fails on re-submission
+POST {{baseUrl}}/assessments/{assessmentId}/submit
+Authorization: Bearer {{token}}
+
+### 17. Submit Assessment - Non-existent Assessment (Should Fail)
+POST {{baseUrl}}/assessments/00000000-0000-0000-0000-000000000000/submit
+Authorization: Bearer {{token}}
+
+### 18. Save Responses After Submit (Should Fail)
+# This should fail because assessment is submitted
+PUT {{baseUrl}}/assessments/{assessmentId}/responses
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "responses": [
+    {
+      "questionId": "REPLACE_WITH_QUESTION_ID",
+      "answer": true
+    }
+  ]
+}
+
+### 19. Delete Assessment - Success
+# Replace {assessmentId} with actual ID
+DELETE {{baseUrl}}/assessments/{assessmentId}
+Authorization: Bearer {{token}}
+
+### 20. Delete Assessment - Not Found (Should Fail)
+DELETE {{baseUrl}}/assessments/00000000-0000-0000-0000-000000000000
+Authorization: Bearer {{token}}
+
+### 21. Delete Assessment - Without Auth (Should Fail)
+DELETE {{baseUrl}}/assessments/{assessmentId}
+
+### 22. Complete Flow - Create, Save, Submit
+# Step 1: Create assessment
+POST {{baseUrl}}/assessments
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "businessProfileId": "REPLACE_WITH_BUSINESS_PROFILE_ID"
+}
+
+# Step 2: Save responses (use assessment ID from step 1)
+# PUT {{baseUrl}}/assessments/{newAssessmentId}/responses
+
+# Step 3: Submit assessment
+# POST {{baseUrl}}/assessments/{newAssessmentId}/submit
+
+### 23. Get Assessment with Responses
+# This should return assessment with all saved responses
+GET {{baseUrl}}/assessments/{assessmentId}
+Authorization: Bearer {{token}}
+
+### 24. Save Complex Responses (Different Answer Types)
+PUT {{baseUrl}}/assessments/{assessmentId}/responses
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "responses": [
+    {
+      "questionId": "QUESTION_ID_YES_NO",
+      "answer": true
+    },
+    {
+      "questionId": "QUESTION_ID_MULTIPLE_CHOICE",
+      "answer": "Option B"
+    },
+    {
+      "questionId": "QUESTION_ID_SCALE",
+      "answer": 7
+    },
+    {
+      "questionId": "QUESTION_ID_TEXT",
+      "answer": "Detailed text response goes here"
+    },
+    {
+      "questionId": "QUESTION_ID_FILE",
+      "answer": {
+        "name": "document.pdf",
+        "size": 1024000,
+        "type": "application/pdf"
+      }
+    }
+  ]
+}

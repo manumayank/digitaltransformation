@@ -33,17 +33,30 @@ export default function NewAssessmentPage() {
     }
   };
 
-  const handleStart = () => {
+  const handleStart = async () => {
     if (!selectedProfileId) {
       toast.error('Please select a business profile');
       return;
     }
 
-    // Generate a temporary assessment ID (in production, this would come from API)
-    const assessmentId = `temp-${Date.now()}`;
+    try {
+      setIsLoading(true);
 
-    // Navigate to assessment page with profile ID
-    router.push(`/assessment/${assessmentId}?profileId=${selectedProfileId}`);
+      // Create assessment via API
+      const { assessmentAPI } = await import('@/lib/api/assessment.api');
+      const assessment = await assessmentAPI.create({
+        businessProfileId: selectedProfileId,
+      });
+
+      toast.success('Assessment created successfully!');
+
+      // Navigate to assessment page
+      router.push(`/assessment/${assessment.id}`);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || 'Failed to create assessment');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (isLoading) {

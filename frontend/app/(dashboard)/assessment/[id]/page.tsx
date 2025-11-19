@@ -56,31 +56,30 @@ export default function AssessmentPage() {
     try {
       setIsLoading(true);
 
-      // For now, we'll create a new assessment
-      // In a real app, we'd fetch existing assessment from API
-      // For this implementation, we'll use URL params to get business profile ID
-
-      const urlParams = new URLSearchParams(window.location.search);
-      const profileId = urlParams.get('profileId');
-
-      if (!profileId) {
-        toast.error('Business profile ID is required');
-        router.push('/business-profile');
-        return;
-      }
+      // Load assessment from API
+      const { assessmentAPI } = await import('@/lib/api/assessment.api');
+      const assessment = await assessmentAPI.getById(assessmentId);
 
       // Load business profile
-      const profile = await businessProfileAPI.getById(profileId);
+      const profile = await businessProfileAPI.getById(assessment.businessProfileId);
       setBusinessProfile(profile);
 
       // Load all modules
       const allModules = await moduleAPI.getAll();
 
-      // Initialize assessment
-      initializeAssessment(assessmentId, profileId, allModules);
+      // Initialize assessment in store
+      initializeAssessment(assessmentId, assessment.businessProfileId, allModules);
+
+      // Load existing responses into store
+      if (assessment.responses && assessment.responses.length > 0) {
+        assessment.responses.forEach((response) => {
+          setAnswer(response.questionId, response.answer);
+        });
+      }
     } catch (error: any) {
       toast.error('Failed to load assessment');
       console.error(error);
+      router.push('/assessment/new');
     } finally {
       setIsLoading(false);
     }
@@ -130,8 +129,15 @@ export default function AssessmentPage() {
   const handleSave = async () => {
     try {
       setIsSaving(true);
-      // TODO: Implement API call to save responses
-      // await assessmentAPI.saveResponses(assessmentId, answers);
+
+      // Convert answers to API format
+      const { assessmentAPI } = await import('@/lib/api/assessment.api');
+      const responses = Object.values(answers).map((answer) => ({
+        questionId: answer.questionId,
+        answer: answer.value,
+      }));
+
+      await assessmentAPI.saveResponses(assessmentId, { responses });
 
       toast.success('Progress saved successfully!');
     } catch (error: any) {
@@ -153,8 +159,20 @@ export default function AssessmentPage() {
 
     try {
       setIsSaving(true);
-      // TODO: Implement API call to submit assessment
-      // await assessmentAPI.submit(assessmentId, answers);
+
+      // First save any pending responses
+      const { assessmentAPI } = await import('@/lib/api/assessment.api');
+      const responses = Object.values(answers).map((answer) => ({
+        questionId: answer.questionId,
+        answer: answer.value,
+      }));
+
+      if (responses.length > 0) {
+        await assessmentAPI.saveResponses(assessmentId, { responses });
+      }
+
+      // Then submit the assessment
+      await assessmentAPI.submit(assessmentId);
 
       toast.success('Assessment submitted successfully!');
       router.push('/dashboard');
