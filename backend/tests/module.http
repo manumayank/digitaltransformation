@@ -1,0 +1,85 @@
+### Module API Tests
+@baseUrl = http://localhost:3001/api/v1
+
+### 1. Get All Modules - Success
+GET {{baseUrl}}/modules
+
+### 2. Get All Modules - Check Cache (run after test 1)
+GET {{baseUrl}}/modules
+
+### 3. Get Module by ID - Success
+# Replace {moduleId} with actual ID from test 1 response
+GET {{baseUrl}}/modules/{moduleId}
+
+### 4. Get Module by ID - Not Found (Should Fail)
+GET {{baseUrl}}/modules/00000000-0000-0000-0000-000000000000
+
+### 5. Get Module by ID - Invalid UUID (Should Fail)
+GET {{baseUrl}}/modules/invalid-uuid
+
+### 6. Get Module by Category - DIGITAL_PRESENCE
+GET {{baseUrl}}/modules/category/DIGITAL_PRESENCE
+
+### 7. Get Module by Category - PROCESS_ORGANIZATION
+GET {{baseUrl}}/modules/category/PROCESS_ORGANIZATION
+
+### 8. Get Module by Category - CRM_ERP_SYSTEMS
+GET {{baseUrl}}/modules/category/CRM_ERP_SYSTEMS
+
+### 9. Get Module by Category - FINANCIAL_SYSTEMS
+GET {{baseUrl}}/modules/category/FINANCIAL_SYSTEMS
+
+### 10. Get Module by Category - TECH_INFRASTRUCTURE
+GET {{baseUrl}}/modules/category/TECH_INFRASTRUCTURE
+
+### 11. Get Module by Category - DATA_SECURITY
+GET {{baseUrl}}/modules/category/DATA_SECURITY
+
+### 12. Get Module by Category - PEOPLE_TRAINING
+GET {{baseUrl}}/modules/category/PEOPLE_TRAINING
+
+### 13. Get Module by Category - CUSTOMER_EXPERIENCE
+GET {{baseUrl}}/modules/category/CUSTOMER_EXPERIENCE
+
+### 14. Get Module by Category - SCALABILITY
+GET {{baseUrl}}/modules/category/SCALABILITY
+
+### 15. Get Module by Category - SUCCESSION_READINESS
+GET {{baseUrl}}/modules/category/SUCCESSION_READINESS
+
+### 16. Get Module by Category - Invalid Category (Should Fail)
+GET {{baseUrl}}/modules/category/INVALID_CATEGORY
+
+### 17. Get Questions for Module - No Filters
+# Replace {moduleId} with actual ID from test 1 response
+GET {{baseUrl}}/modules/{moduleId}/questions
+
+### 18. Get Questions for Module - Filter by Industry (TECHNOLOGY)
+# Replace {moduleId} with actual ID from test 1 response
+GET {{baseUrl}}/modules/{moduleId}/questions?industry=TECHNOLOGY
+
+### 19. Get Questions for Module - Filter by Size (SMALL)
+# Replace {moduleId} with actual ID from test 1 response
+GET {{baseUrl}}/modules/{moduleId}/questions?size=SMALL
+
+### 20. Get Questions for Module - Filter by Industry and Size
+# Replace {moduleId} with actual ID from test 1 response
+GET {{baseUrl}}/modules/{moduleId}/questions?industry=RETAIL&size=MEDIUM
+
+### 21. Get Questions for Module - Invalid Module ID (Should Fail)
+GET {{baseUrl}}/modules/00000000-0000-0000-0000-000000000000/questions
+
+### 22. Get Questions for Module - Filter by Industry (HEALTHCARE)
+# Replace {moduleId} with actual ID from test 1 response
+GET {{baseUrl}}/modules/{moduleId}/questions?industry=HEALTHCARE
+
+### 23. Get Questions for Module - Filter by Industry (MANUFACTURING)
+# Replace {moduleId} with actual ID from test 1 response
+GET {{baseUrl}}/modules/{moduleId}/questions?industry=MANUFACTURING
+
+### 24. Verify Module Count Matches Expected (10 modules)
+GET {{baseUrl}}/modules
+
+### 25. Verify All Modules Have Questions
+# This should return modules with question counts
+GET {{baseUrl}}/modules
