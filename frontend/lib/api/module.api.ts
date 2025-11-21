@@ -1,4 +1,4 @@
-import apiClient from './client';
+import { apiClient } from '../api-client';
 
 // Enums matching backend
 export enum ModuleCategory {
