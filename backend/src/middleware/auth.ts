@@ -3,16 +3,8 @@ import jwt from 'jsonwebtoken';
 import { UnauthorizedError } from '../utils/errors';
 import { prisma } from '../config/database';
 
-export interface AuthRequest extends Request {
-  user?: {
-    id: string;
-    email: string;
-    role: string;
-  };
-}
-
 export async function authenticate(
-  req: AuthRequest,
+  req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
@@ -65,7 +57,7 @@ export async function authenticate(
 }
 
 export function authorize(...roles: string[]) {
-  return (req: AuthRequest, res: Response, next: NextFunction): void => {
+  return (req: Request, res: Response, next: NextFunction): void => {
     if (!req.user) {
       throw new UnauthorizedError('Authentication required');
     }

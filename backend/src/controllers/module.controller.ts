@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { PrismaClient, ModuleCategory } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import { ModuleCategory } from '@shared/types';
 
 const prisma = new PrismaClient();
 

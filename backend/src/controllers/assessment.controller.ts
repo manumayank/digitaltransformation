@@ -20,7 +20,7 @@ export class AssessmentController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.id;
       if (!userId) {
         res.status(401).json({ message: 'Unauthorized' });
         return;
@@ -79,7 +79,7 @@ export class AssessmentController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.id;
       if (!userId) {
         res.status(401).json({ message: 'Unauthorized' });
         return;
@@ -124,7 +124,7 @@ export class AssessmentController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.id;
       const { id } = req.params;
 
       if (!userId) {
@@ -221,7 +221,7 @@ export class AssessmentController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.id;
       const { id } = req.params;
       const { responses } = req.body;
 
@@ -295,7 +295,7 @@ export class AssessmentController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.id;
       const { id } = req.params;
 
       if (!userId) {
@@ -425,7 +425,7 @@ export class AssessmentController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.id;
       const { id } = req.params;
 
       if (!userId) {

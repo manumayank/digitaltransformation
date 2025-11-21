@@ -1,4 +1,5 @@
-import { PrismaClient, RiskLevel, ModuleCategory } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import { RiskLevel, ModuleCategory } from '@shared/types';
 
 const prisma = new PrismaClient();
 

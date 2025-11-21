@@ -18,7 +18,7 @@ export class BusinessProfileController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.id;
       if (!userId) {
         res.status(401).json({ message: 'Unauthorized' });
         return;
@@ -53,7 +53,7 @@ export class BusinessProfileController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.id;
       if (!userId) {
         res.status(401).json({ message: 'Unauthorized' });
         return;
@@ -90,7 +90,7 @@ export class BusinessProfileController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.id;
       const { id } = req.params;
 
       if (!userId) {
@@ -144,7 +144,7 @@ export class BusinessProfileController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.id;
       const { id } = req.params;
       const data: UpdateBusinessProfileInput = req.body;
 
@@ -188,7 +188,7 @@ export class BusinessProfileController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.id;
       const { id } = req.params;
 
       if (!userId) {
@@ -246,7 +246,7 @@ export class BusinessProfileController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.id;
       const { id } = req.params;
 
       if (!userId) {

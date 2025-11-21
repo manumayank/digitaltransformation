@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { prisma } from '../config/database';
-import { AuthRequest } from '../middleware/auth';
 import { BadRequestError, NotFoundError } from '../utils/errors';
 import { authService } from '../services/auth.service';
 import { logger } from '../utils/logger';
@@ -10,7 +9,7 @@ export class UserController {
    * Get current user profile
    * GET /api/v1/users/profile
    */
-  async getProfile(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  async getProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.id;
 
@@ -51,7 +50,7 @@ export class UserController {
    * Update user profile
    * PUT /api/v1/users/profile
    */
-  async updateProfile(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  async updateProfile(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.id;
       const { firstName, lastName, phone } = req.body;
@@ -99,7 +98,7 @@ export class UserController {
    * Change user password
    * PUT /api/v1/users/password
    */
-  async changePassword(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  async changePassword(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.id;
       const { currentPassword, newPassword } = req.body;
@@ -130,7 +129,7 @@ export class UserController {
    * Delete user account
    * DELETE /api/v1/users/account
    */
-  async deleteAccount(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  async deleteAccount(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.id;
       const { password } = req.body;
@@ -184,7 +183,7 @@ export class UserController {
    * Get user statistics
    * GET /api/v1/users/stats
    */
-  async getStats(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  async getStats(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.id;
 

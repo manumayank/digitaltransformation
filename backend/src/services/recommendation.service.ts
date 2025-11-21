@@ -1,4 +1,5 @@
-import { PrismaClient, RecommendationPriority, ModuleCategory } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+import { RecommendationPriority, ModuleCategory } from '@shared/types';
 
 const prisma = new PrismaClient();
 

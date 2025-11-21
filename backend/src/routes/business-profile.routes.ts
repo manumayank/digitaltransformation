@@ -1,6 +1,6 @@
 import express from 'express';
 import { BusinessProfileController } from '../controllers/business-profile.controller';
-import { authenticate } from '../middleware/auth.middleware';
+import { authenticate } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import {
   createBusinessProfileSchema,

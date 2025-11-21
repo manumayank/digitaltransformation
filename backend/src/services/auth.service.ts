@@ -4,7 +4,6 @@ import { prisma } from '../config/database';
 import { cache } from '../config/redis';
 import { ConflictError, UnauthorizedError, BadRequestError } from '../utils/errors';
 import { logger } from '../utils/logger';
-import type { User } from '@prisma/client';
 
 interface TokenPayload {
   userId: string;
@@ -18,7 +17,7 @@ interface AuthTokens {
 }
 
 interface AuthResponse {
-  user: Omit<User, 'passwordHash'>;
+  user: any;
   tokens: AuthTokens;
 }
 
@@ -225,7 +224,7 @@ export class AuthService {
   /**
    * Generate JWT tokens
    */
-  private async generateTokens(user: User): Promise<AuthTokens> {
+  private async generateTokens(user: any): Promise<AuthTokens> {
     const payload: TokenPayload = {
       userId: user.id,
       email: user.email,
@@ -234,13 +233,13 @@ export class AuthService {
 
     // Generate access token
     const accessToken = jwt.sign(payload, this.JWT_SECRET, {
-      expiresIn: this.JWT_EXPIRES_IN,
-    });
+      expiresIn: this.JWT_EXPIRES_IN as string,
+    } as jwt.SignOptions);
 
     // Generate refresh token
     const refreshToken = jwt.sign(payload, this.JWT_REFRESH_SECRET, {
-      expiresIn: this.JWT_REFRESH_EXPIRES_IN,
-    });
+      expiresIn: this.JWT_REFRESH_EXPIRES_IN as string,
+    } as jwt.SignOptions);
 
     // Store refresh token in database
     const expiresAt = new Date();

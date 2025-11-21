@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
 import { authService } from '../services/auth.service';
-import { AuthRequest } from '../middleware/auth';
 import { logger } from '../utils/logger';
 import type { RegisterInput, LoginInput, RefreshTokenInput } from '../validators/auth.validator';
 
@@ -93,7 +92,7 @@ export class AuthController {
    * Logout user
    * POST /api/v1/auth/logout
    */
-  async logout(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  async logout(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.id;
       const refreshToken = req.body.refreshToken;
@@ -121,7 +120,7 @@ export class AuthController {
    * Get current user profile
    * GET /api/v1/auth/me
    */
-  async getCurrentUser(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  async getCurrentUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.id;
 
@@ -171,7 +170,7 @@ export class AuthController {
    * Change password
    * POST /api/v1/auth/change-password
    */
-  async changePassword(req: AuthRequest, res: Response, next: NextFunction): Promise<void> {
+  async changePassword(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const userId = req.user?.id;
       const { currentPassword, newPassword } = req.body;

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { authenticate } from '../middleware/auth.middleware';
+import { authenticate } from '../middleware/auth';
 import { validate } from '../middleware/validate';
 import { AssessmentController } from '../controllers/assessment.controller';
 import {

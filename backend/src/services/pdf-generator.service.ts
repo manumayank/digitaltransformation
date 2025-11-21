@@ -109,7 +109,7 @@ export class PDFGeneratorService {
     // Finalize PDF
     doc.end();
 
-    return doc;
+    return doc as unknown as Readable;
   }
 
   /**

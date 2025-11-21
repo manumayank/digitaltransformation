@@ -1,12 +1,12 @@
 import { Router } from 'express';
 import { ReportController } from '../controllers/report.controller';
-import { authMiddleware } from '../middleware/auth.middleware';
+import { authenticate } from '../middleware/auth';
 
 const router = Router();
 const reportController = new ReportController();
 
 // All report routes require authentication
-router.use(authMiddleware);
+router.use(authenticate);
 
 /**
  * @route   GET /api/v1/reports/assessment/:id/pdf

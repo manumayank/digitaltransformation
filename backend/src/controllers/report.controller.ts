@@ -14,7 +14,7 @@ export class ReportController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userId = req.user?.userId;
+      const userId = req.user?.id;
       const { id: assessmentId } = req.params;
 
       if (!userId) {

@@ -1,10 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../utils/errors';
 import { logger } from '../utils/logger';
-import { Prisma } from '@prisma/client';
 
 export function errorHandler(
-  err: Error,
+  err: any,
   req: Request,
   res: Response,
   next: NextFunction
@@ -18,13 +17,13 @@ export function errorHandler(
   });
 
   // Handle Prisma errors
-  if (err instanceof Prisma.PrismaClientKnownRequestError) {
+  if (err.code && err.code.startsWith('P')) {
     handlePrismaError(err, res);
     return;
   }
 
   // Handle validation errors
-  if (err instanceof Prisma.PrismaClientValidationError) {
+  if (err.name === 'PrismaClientValidationError') {
     res.status(400).json({
       success: false,
       message: 'Validation error',
@@ -60,7 +59,7 @@ export function errorHandler(
 }
 
 function handlePrismaError(
-  err: Prisma.PrismaClientKnownRequestError,
+  err: any,
   res: Response
 ): void {
   switch (err.code) {
