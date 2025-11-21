@@ -25,11 +25,6 @@ const nextConfig = {
     formats: ['image/avif', 'image/webp'],
   },
 
-  // Experimental features
-  experimental: {
-    serverActions: true,
-  },
-
   // Headers for security
   async headers() {
     return [
