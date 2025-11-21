@@ -3,6 +3,11 @@ const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
 
+  // Disable ESLint during builds (run separately in CI/CD)
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   // API proxy configuration
   async rewrites() {
     return [
