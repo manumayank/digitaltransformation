@@ -41,11 +41,11 @@ export const useAuthStore = create<AuthState>()(
             password,
           });
 
-          const { user, tokens } = response.data.data;
+          const { user, token, refreshToken } = response.data.data;
 
           // Store tokens
-          apiClient.setToken(tokens.accessToken);
-          apiClient.setRefreshToken(tokens.refreshToken);
+          apiClient.setToken(token);
+          apiClient.setRefreshToken(refreshToken);
 
           set({
             user,
@@ -71,11 +71,11 @@ export const useAuthStore = create<AuthState>()(
 
           const response = await apiClient.post<{ data: AuthResponse }>('/auth/register', data);
 
-          const { user, tokens } = response.data.data;
+          const { user, token, refreshToken } = response.data.data;
 
           // Store tokens
-          apiClient.setToken(tokens.accessToken);
-          apiClient.setRefreshToken(tokens.refreshToken);
+          apiClient.setToken(token);
+          apiClient.setRefreshToken(refreshToken);
 
           set({
             user,

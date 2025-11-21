@@ -193,13 +193,14 @@ export default function AssessmentPage() {
   const progress = getProgress();
 
   const isFirstQuestion = currentModuleIndex === 0 && currentQuestionIndex === 0;
-  const isLastQuestion =
+  const isLastQuestion = Boolean(
     currentModuleIndex === modules.length - 1 &&
     currentQuestion &&
     currentQuestionIndex ===
       (useAssessmentStore.getState().questionsByModule[currentModule?.id || '']
         ?.length || 0) -
-        1;
+        1
+  );
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">

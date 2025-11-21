@@ -13,7 +13,7 @@ import {
   getRecommendationPriorityLabel,
   getRecommendationPriorityColor,
 } from '@/lib/api/assessment.api';
-import { getModuleCategoryLabel, getModuleIcon, getModuleColor } from '@/lib/api/module.api';
+import { getModuleCategoryLabel, getModuleIcon, getModuleColor, ModuleCategory } from '@/lib/api/module.api';
 
 export default function AssessmentResultsPage() {
   const params = useParams();
@@ -267,8 +267,10 @@ export default function AssessmentResultsPage() {
               <h3 className="mb-4 text-lg font-semibold text-gray-900">Module Breakdown</h3>
               <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
                 {assessment.moduleScores?.map((moduleScore) => {
-                  const icon = getModuleIcon(moduleScore.module?.category || '');
-                  const color = getModuleColor(moduleScore.module?.category || '');
+                  if (!moduleScore.module?.category) return null;
+
+                  const icon = getModuleIcon(moduleScore.module.category as ModuleCategory);
+                  const color = getModuleColor(moduleScore.module.category as ModuleCategory);
                   const score = Math.round(moduleScore.score);
 
                   return (
@@ -281,7 +283,7 @@ export default function AssessmentResultsPage() {
                               {moduleScore.module?.name}
                             </h4>
                             <p className="text-xs text-gray-500">
-                              {getModuleCategoryLabel(moduleScore.module?.category || '')}
+                              {getModuleCategoryLabel(moduleScore.module.category as ModuleCategory)}
                             </p>
                           </div>
                         </div>
