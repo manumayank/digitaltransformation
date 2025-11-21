@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import './globals.css';
 import { Toaster } from 'react-hot-toast';
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+// Using system fonts for reliability during build
+// Google Fonts can be added later via CDN if needed
 
 export const metadata: Metadata = {
   title: 'DRLTAS - Digital Readiness & Legacy-Transfer Audit System',
@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en">
       <body>
         {children}
         <Toaster
